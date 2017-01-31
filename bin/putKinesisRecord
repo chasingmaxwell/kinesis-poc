@@ -1,0 +1,32 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Aws\Kinesis\KinesisClient;
+use Noodlehaus\Config;
+
+$config = new Config([
+  __DIR__ . '/../config/default.yml',
+  getenv('HOME') . '/.config/kinesis-poc',
+  '?' . __DIR__ . '/../config/local.yml'
+]);
+
+$opts = getopt('s:d:p:');
+
+if (!isset($opts['s'], $opts['d'], $opts['p'])) {
+  throw new Exception('Arguments -s, -d, and -p are all required.');
+}
+
+$kinesis = new KinesisClient($config->get('kinesisClientOptions'));
+
+// Put record.
+$response = $kinesis->putRecord([
+  'StreamName' => $opts['s'],
+  'Data' => $opts['d'],
+  'PartitionKey' => $opts['p'],
+]);
+
+var_dump($response);
+
+?>
