@@ -1,14 +1,25 @@
 #!/usr/bin/php
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+// Include autoloader.
+foreach ([
+  // As a global or dependent package.
+  __DIR__ . '/../../../autoload.php',
+  // Within the kinesis-poc package.
+  __DIR__ . '/../vendor/autoload.php'
+] as $candidate) {
+  if (file_exists($candidate)) {
+    require_once $candidate;
+    break;
+  }
+}
 
 use Aws\Kinesis\KinesisClient;
 use Noodlehaus\Config;
 
 $config = new Config([
   __DIR__ . '/../config/default.yml',
-  getenv('HOME') . '/.config/kinesis-poc',
+  '?' . getenv('HOME') . '/.config/kinesis-poc',
   '?' . __DIR__ . '/../config/local.yml'
 ]);
 
@@ -28,5 +39,7 @@ $response = $kinesis->putRecord([
 ]);
 
 var_dump($response);
+
+exit();
 
 ?>
